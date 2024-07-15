@@ -1,18 +1,19 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_vision/flutter_vision.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 late List<CameraDescription> camerass;
 
-class YoloVideo extends StatefulWidget {
-  const YoloVideo({super.key});
+class YoloCamera extends StatefulWidget {
+  const YoloCamera({super.key, required this.controller, required this.vision});
+  final CameraController controller;
+  final FlutterVision vision;
 
   @override
-  State<YoloVideo> createState() => _YoloVideoState();
+  State<YoloCamera> createState() => _YoloVideoState();
 }
 
-class _YoloVideoState extends State<YoloVideo> {
+class _YoloVideoState extends State<YoloCamera> {
 // Here we start writing our code.
   late CameraController controller;
   late FlutterVision vision;
@@ -37,42 +38,41 @@ class _YoloVideoState extends State<YoloVideo> {
   @override
   void initState() {
     super.initState();
-    init();
+    setState(() {
+      controller = widget.controller;
+      vision = widget.vision;
+      yoloResults = [];
+      isDetecting = false;
+    });
+    // init();
   }
 
-  init() async {
-    camerass = await availableCameras();
-    vision = FlutterVision();
-    controller = CameraController(camerass[0], ResolutionPreset.high);
-    controller.initialize().then((value) {
-      loadYoloModel().then((value) {
-        setState(() {
-          isLoaded = true;
-          isDetecting = false;
-          yoloResults = [];
-        });
-      });
-    });
-  }
+  // init() async {
+  //   camerass = await availableCameras();
+  //   vision = FlutterVision();
+  //   controller = CameraController(camerass[0], ResolutionPreset.high);
+  //   controller.initialize().then((value) {
+  //     loadYoloModel().then((value) {
+  //       setState(() {
+  //         isLoaded = true;
+  //         isDetecting = false;
+  //         yoloResults = [];
+  //       });
+  //     });
+  //   });
+  // }
 
   @override
   void dispose() async {
     super.dispose();
-    controller.dispose();
-    await vision.closeYoloModel();
+    // controller.dispose();
+    // await vision.closeYoloModel();
   }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    if (!isLoaded) {
-      return const Scaffold(
-        body: Center(
-          child: Text("Model not loaded, waiting for it"),
-        ),
-      );
-    }
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
